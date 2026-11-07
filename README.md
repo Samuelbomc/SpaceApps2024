@@ -1,23 +1,50 @@
-# spaceapp2024_seism_detection_challenge
+# SpaceApps 2024 Seismic Detection Challenge
 
-To use the program its necessary to install the data folder (Found here https://wufs.wustl.edu/SpaceApps/data/space_apps_2024_seismic_detection.zip) and the file Seism_Detect_Final.py. Also, you need to create a directory called 'output'. Then, when you run 'Seism_Detect_Final.py', its going to first ask you if you want to analyze data from either Mars or from the Moon. After that its going to ask which dataset to use. Finally, if applicable, it will ask which package to use. The graphs will be stored in the folder ./output/figures/(Celestial body chosen) and the catalog with the detections will be placed at ./output/. There is also a file called "Parameter_finder" that compares the results of the parameters given with the correct detection, looking for the configuration that get the lowest difference score.
+## Usage
 
-The implementation of Training_Data.py is pending, we plan to implement in the future a machine learning algorythm that given large databases of noise (Sounds other than seisms found on celestial bodies surfaces) can then eliminate simmilar behaving patterns on the raw data before its analysis its done.
+Download the seismic data from [the SpaceApps data archive](https://wufs.wustl.edu/SpaceApps/data/space_apps_2024_seismic_detection.zip) and place the extracted `data` directory and `Seism_Detect_Final.py` in the project directory. The program creates the required output directories automatically.
 
-The following Python libraries are required to run both programs:
+Run the detector with:
 
-Obspy, Scipy, Numpy, Pandas, Datetime, Matplotlib, Glob, OS, and Noisereduce
+```bash
+python Seism_Detect_Final.py
+```
 
-// Proyect Description
+The program first asks whether plots should be created. It then asks whether the data is from Mars or the Moon and which dataset to use. For the lunar test selection, it also asks which package to analyze.
 
-The Informed Seism Detector (ISD) is a seismic data processing program designed to identify seismic events obscured by various noise sources at the Moon and Mars. By locally analyzing the data and transmitting only the relevant information, the ISD optimizes bandwidth usage, which is essential given the vast distances involved in transmitting data from space.
+Figures are saved under `./output/figures/<celestial body>/`. Detection catalogs are saved under `./output/` as `catalog_mars.csv` or `catalog_moon.csv`.
 
-The program adapts its approach based on the origin of the seismic data. For instance, Mars data is analyzed in a frequency range from 0.1 to 9.9 Hz, using shorter windows for Short-Term Average (STA) and Long-Term Average (LTA) measurements (60 and 250 seconds, respectively) with a STA/LTA ratio threshold of 1.5 to indicate potential seismic activity. In contrast, lunar data is processed over a narrower range of 0.1 to 3.2 Hz, using extended STA and LTA windows (100 and 1000 seconds, respectively) due to the unique seismic properties of the Moon.
+`Parameter_finder.py` is an additional script intended to search for detector parameter values by comparing generated detections with a reference catalog.
 
-Once the data is filtered using a bandpass filter, the ISD applies a noise reduction step, using Gaussian filtering with parameters tailored for each dataset. Noise is further reduced by an adaptive algorithm that identifies outliers based on local mean and standard deviation, replacing them with averaged values.
+## Dependencies
 
-The STA/LTA algorithm is then applied, detecting seismic events when the STA-to-LTA ratio exceeds the threshold. The ISD also checks event power using a thresholding method to ensure detected events are significant; valid detections are recorded only if the power exceeds a set level. A minimum time gap between detections is enforced to avoid redundant triggers.
+The scripts use the following Python packages:
 
-If enabled, the ISD creates visual outputs, including time series, filtered traces, logarithmic scale traces, STA/LTA plots, and spectrograms. For lunar and Martian data, it uses specific label configurations based on the source characteristics. Spectrograms are generated and scaled to enhance the visibility of seismic events, with logarithmic scaling on trace plots to highlight seismic waveforms against background noise.
+- [ObsPy](https://docs.obspy.org/)
+- SciPy
+- NumPy
+- pandas
+- Matplotlib
+- noisereduce
 
-For each detected event, the ISD logs details such as the absolute and relative event time, filename, and event ID in a catalog file, stored in CSV format. This catalog, along with the visual outputs saved as PNG files, provides a comprehensive record of the seismic events, facilitating efficient data analysis and selective transmission across space.
+The scripts also use Python standard-library modules including `datetime`, `glob`, `os`, and `random`.
+
+## Project Description
+
+The Informed Seism Detector (ISD) is a seismic data processing program designed to identify potential seismic events in data from the Moon and Mars. It processes the data locally and records detected events in a catalog.
+
+The program uses different parameters for each celestial body. Mars data is processed with a frequency range of 0.1 to 9.9 Hz, Short-Term Average (STA) and Long-Term Average (LTA) windows of 60 and 250 seconds, respectively, and a trigger-on threshold of 1.5. Lunar data is processed with a frequency range of 0.1 to 3.2 Hz, STA and LTA windows of 100 and 1,000 seconds, respectively, and a trigger-on threshold of 1.5.
+
+The data is filtered with a bandpass filter and then processed with Gaussian filtering, `noisereduce`, and an outlier-reduction step based on a local mean and standard deviation. The detector then applies STA/LTA processing and an amplitude-based threshold to filter potential triggers.
+
+When plotting is enabled, the program generates time-series plots, filtered traces, logarithmic-scale traces, STA/LTA plots, and spectrograms. The figures are saved as PNG files.
+
+For each accepted trigger, the program records the absolute and relative event times, filename, and event ID in a CSV catalog.
+
+## Known Issues
+
+- `Seism_Detect_Final.py` calls `classic_sta_lta` and `trigger_onset` without importing them. As written, this causes files to be skipped when STA/LTA processing is reached, so detections and catalogs may not be produced.
+- The lunar `Test` option points to directories under `data/lunar/training/data/`, so the option name and directory selection do not consistently distinguish test data from training data.
+- In the lunar configuration, `n_fft` is assigned as a one-item tuple because of a trailing comma. This may cause the `noisereduce` call to fail.
+- The power-check loop reads 200 samples after each trigger without checking the trace length, so a trigger near the end of a trace may cause an indexing error.
+- `Parameter_finder.py` also calls `classic_sta_lta` and `trigger_onset` without importing them. It contains additional runtime and logic problems, including a reference to `data` where `data3` is intended and a comparison branch that cannot find a closest output detection when the output rows are empty.

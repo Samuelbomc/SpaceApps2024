@@ -1,5 +1,9 @@
 # SpaceApps 2024 Seismic Detection Challenge
 
+## Disclaimer
+
+AI was used during the software's development process
+
 ## Usage
 
 Download the seismic data from [the SpaceApps data archive](https://wufs.wustl.edu/SpaceApps/data/space_apps_2024_seismic_detection.zip) and place the extracted `data` directory and `Seism_Detect_Final.py` in the project directory. The program creates the required output directories automatically.
@@ -48,8 +52,4 @@ For each accepted trigger, the program records the absolute and relative event t
 - In the lunar configuration, `n_fft` is assigned as a one-item tuple because of a trailing comma. This may cause the `noisereduce` call to fail.
 - The power-check loop reads 200 samples after each trigger without checking the trace length, so a trigger near the end of a trace may cause an indexing error.
 - `Parameter_finder.py` also calls `classic_sta_lta` and `trigger_onset` without importing them. It contains additional runtime and logic problems, including a reference to `data` where `data3` is intended and a comparison branch that cannot find a closest output detection when the output rows are empty.
-
-## Disclaimer
-
-This was one of my first coding projects, so quite a bit of AI was used in it's creation process
 

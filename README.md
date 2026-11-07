@@ -1,8 +1,6 @@
 # SpaceApps 2024 Seismic Detection Challenge
 
-## Disclaimer
-
-Coding AI was used during the software's development process
+> **AI-use disclaimer:** This project was developed with assistance from AI tools. AI-generated suggestions were reviewed and adapted by the project team, the team remains responsible for the implementation and its results.
 
 ## Usage
 

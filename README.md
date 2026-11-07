@@ -1,5 +1,9 @@
 # SpaceApps 2024 Seismic Detection Challenge
 
+## Disclaimer
+
+This was one of my first coding projects, so quite a bit of AI was used in it's creation process
+
 ## Usage
 
 Download the seismic data from [the SpaceApps data archive](https://wufs.wustl.edu/SpaceApps/data/space_apps_2024_seismic_detection.zip) and place the extracted `data` directory and `Seism_Detect_Final.py` in the project directory. The program creates the required output directories automatically.

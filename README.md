@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-AI was used during the software's development process
+Coding AI was used during the software's development process
 
 ## Usage
 
